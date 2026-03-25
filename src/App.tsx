@@ -5,10 +5,7 @@ import Users from '@/pages/Users';
 import Transactions from '@/pages/Transactions';
 import Portfolio from '@/pages/Portfolio';
 import Gifts from '@/pages/Gifts';
-
-function Placeholder({ title }: { title: string }) {
-  return <div className="p-8 text-secondary">{title} — coming soon</div>;
-}
+import Health from '@/pages/Health';
 
 export default function App() {
   return (
@@ -19,7 +16,7 @@ export default function App() {
         <Route path="/transactions" element={<Transactions />} />
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/gifts" element={<Gifts />} />
-        <Route path="/health" element={<Placeholder title="Health" />} />
+        <Route path="/health" element={<Health />} />
       </Routes>
     </PageShell>
   );
