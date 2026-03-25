@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import TopBar from '@/components/layout/TopBar';
 import MetricCard from '@/components/cards/MetricCard';
 import ChartCard from '@/components/charts/ChartCard';
@@ -19,7 +19,6 @@ const columns: Column<DbUser>[] = [
   { key: 'created', header: 'Joined', render: (r) => formatRelativeTime(r.created_at), sortKey: (r) => r.created_at },
 ];
 
-const KYC_COLORS = [CHART_COLORS.amber, CHART_COLORS.emerald, CHART_COLORS.rose];
 
 export default function Users() {
   const metrics = useQuery({ queryKey: [PAGE_KEY, 'metrics'], queryFn: fetchUserMetrics });
@@ -30,12 +29,6 @@ export default function Users() {
 
   const m = metrics.data;
   const s = segments.data;
-
-  const kycData = m ? [
-    { name: 'Pending', value: m.kycPending },
-    { name: 'Verified', value: m.kycVerified },
-    { name: 'Rejected', value: m.kycRejected },
-  ] : [];
 
   const segmentData = s ? [
     { name: 'Never Transacted', value: s.neverTransacted },
@@ -80,16 +73,10 @@ export default function Users() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <ChartCard title="KYC Status" loading={metrics.isLoading} isEmpty={kycData.every((d) => d.value === 0)}>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie data={kycData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" label={({ name, value }) => `${name}: ${value}`}>
-                  {kycData.map((_, i) => <Cell key={i} fill={KYC_COLORS[i]} />)}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </ChartCard>
+          <div className="bg-card border border-border rounded-lg p-4 flex flex-col items-center justify-center opacity-60">
+            <h3 className="text-sm font-medium text-primary mb-2">KYC Status</h3>
+            <p className="text-xs text-secondary">Coming soon</p>
+          </div>
 
           <ChartCard title="User Segments" loading={segments.isLoading} isEmpty={!s}>
             <ResponsiveContainer width="100%" height={200}>

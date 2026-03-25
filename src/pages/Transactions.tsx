@@ -9,29 +9,40 @@ import StatusBadge from '@/components/shared/StatusBadge';
 import UnitToggle from '@/components/shared/UnitToggle';
 import DateRangeSelect from '@/components/shared/DateRangeSelect';
 import { fetchTransactionMetrics, fetchRecentTransactions, fetchVolumeTimeSeries, fetchHourlyDistribution, fetchBuySellRatio, fetchOrderSizeDistribution } from '@/lib/queries/transactions';
-import { formatINR, formatRelativeTime, getExplorerUrl, truncateHash } from '@/lib/formatters';
+import { fetchLatestPrice } from '@/lib/queries/price';
+import { formatINR, formatINRValue, formatRelativeTime, getExplorerUrl, truncateHash } from '@/lib/formatters';
+import { useUnit } from '@/contexts/UnitContext';
 import { CHART_COLORS } from '@/lib/constants';
-import type { DateRangePreset, DbTransaction } from '@/types';
+import type { DateRangePreset, DbTransaction, Unit } from '@/types';
 
 const PAGE_KEY = 'transactions';
 
-const columns: Column<DbTransaction>[] = [
-  { key: 'type', header: 'Type', render: (r) => <span className={r.type === 'buy' ? 'text-emerald-600' : 'text-rose-600'}>{r.type.toUpperCase()}</span> },
-  { key: 'amount', header: 'Amount (INR)', render: (r) => r.inr_amount ? formatINR(r.inr_amount) : '—', sortKey: (r) => r.inr_amount ?? 0 },
-  { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-  { key: 'tx', header: 'Tx Hash', render: (r) => {
-    const hash = r.dex_swap_tx_hash ?? r.blockchain_tx_hash;
-    if (!hash) return '—';
-    return <a href={getExplorerUrl(hash, r.created_at)} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-mono text-xs">{truncateHash(hash)}</a>;
-  }},
-  { key: 'date', header: 'Date', render: (r) => formatRelativeTime(r.created_at), sortKey: (r) => r.created_at },
-];
+function getColumns(unit: Unit, price: { gold_price_usd: number; gold_price_inr: number; usd_inr_rate: number } | null): Column<DbTransaction>[] {
+  const fmtAmount = (inr: number) => {
+    if (!price) return formatINR(inr);
+    return formatINRValue(inr, unit, { ...price, timestamp: '' });
+  };
+
+  return [
+    { key: 'type', header: 'Type', render: (r) => <span className={r.type === 'buy' ? 'text-emerald-600' : 'text-rose-600'}>{r.type.toUpperCase()}</span> },
+    { key: 'amount', header: `Amount (${unit})`, render: (r) => r.inr_amount ? fmtAmount(r.inr_amount) : '—', sortKey: (r) => r.inr_amount ?? 0 },
+    { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+    { key: 'tx', header: 'Tx Hash', render: (r) => {
+      const hash = r.dex_swap_tx_hash ?? r.blockchain_tx_hash;
+      if (!hash) return '—';
+      return <a href={getExplorerUrl(hash, r.created_at)} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-mono text-xs">{truncateHash(hash)}</a>;
+    }},
+    { key: 'date', header: 'Date', render: (r) => formatRelativeTime(r.created_at), sortKey: (r) => r.created_at },
+  ];
+}
 
 export default function Transactions() {
+  const { unit } = useUnit();
   const [preset, setPreset] = useState<DateRangePreset>('7d');
   const [typeFilter, setTypeFilter] = useState<'buy' | 'sell' | ''>('');
   const [statusFilter, setStatusFilter] = useState<string>('');
 
+  const price = useQuery({ queryKey: ['price'], queryFn: fetchLatestPrice });
   const metrics = useQuery({ queryKey: [PAGE_KEY, 'metrics', preset], queryFn: () => fetchTransactionMetrics(preset) });
   const txList = useQuery({ queryKey: [PAGE_KEY, 'list', preset, typeFilter, statusFilter], queryFn: () => fetchRecentTransactions(preset, {
     type: typeFilter || undefined,
@@ -43,6 +54,14 @@ export default function Transactions() {
   const orderSizes = useQuery({ queryKey: [PAGE_KEY, 'orderSizes', preset], queryFn: () => fetchOrderSizeDistribution(preset) });
 
   const m = metrics.data;
+  const p = price.data ?? null;
+
+  const fmtINR = (v: number) => {
+    if (!p) return formatINR(v);
+    return formatINRValue(v, unit, { ...p, timestamp: '' });
+  };
+
+  const columns = getColumns(unit, p);
 
   return (
     <>
@@ -52,9 +71,9 @@ export default function Transactions() {
       </TopBar>
       <div className="p-6 space-y-6 max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard title="Buy Volume" value={m ? formatINR(m.buyVolumeINR) : '—'} subtitle={m ? `${m.buyCount} orders` : undefined} loading={metrics.isLoading} />
-          <MetricCard title="Sell Volume" value={m ? formatINR(m.sellVolumeINR) : '—'} subtitle={m ? `${m.sellCount} orders` : undefined} loading={metrics.isLoading} />
-          <MetricCard title="Avg Order Size" value={m ? formatINR(m.avgOrderSize) : '—'} loading={metrics.isLoading} />
+          <MetricCard title="Buy Volume" value={m ? fmtINR(m.buyVolumeINR) : '—'} subtitle={m ? `${m.buyCount} orders` : undefined} loading={metrics.isLoading} />
+          <MetricCard title="Sell Volume" value={m ? fmtINR(m.sellVolumeINR) : '—'} subtitle={m ? `${m.sellCount} orders` : undefined} loading={metrics.isLoading} />
+          <MetricCard title="Avg Order Size" value={m ? fmtINR(m.avgOrderSize) : '—'} loading={metrics.isLoading} />
           <MetricCard title="Success Rate" value={m ? `${m.successRate.toFixed(1)}%` : '—'} subtitle={m ? `${m.failedCount} failed` : undefined} loading={metrics.isLoading} />
         </div>
 
@@ -64,7 +83,7 @@ export default function Transactions() {
               <BarChart data={volume.data}>
                 <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d: string) => d.slice(5)} />
                 <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip formatter={(v: number) => formatINR(v)} />
+                <Tooltip formatter={(v: number) => fmtINR(v)} />
                 <Legend />
                 <Bar dataKey="buy" fill={CHART_COLORS.blue} stackId="a" radius={[2, 2, 0, 0]} name="Buy" />
                 <Bar dataKey="sell" fill={CHART_COLORS.emerald} stackId="a" name="Sell" />
