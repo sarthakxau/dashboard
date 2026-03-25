@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import PageShell from '@/components/layout/PageShell';
 import Overview from '@/pages/Overview';
+import Users from '@/pages/Users';
 
 function Placeholder({ title }: { title: string }) {
   return <div className="p-8 text-secondary">{title} — coming soon</div>;
@@ -11,7 +12,7 @@ export default function App() {
     <PageShell>
       <Routes>
         <Route path="/" element={<Overview />} />
-        <Route path="/users" element={<Placeholder title="Users" />} />
+        <Route path="/users" element={<Users />} />
         <Route path="/transactions" element={<Placeholder title="Transactions" />} />
         <Route path="/portfolio" element={<Placeholder title="Portfolio" />} />
         <Route path="/gifts" element={<Placeholder title="Gifts" />} />
