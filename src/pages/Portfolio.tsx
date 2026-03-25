@@ -34,6 +34,7 @@ export default function Portfolio() {
   const tvlTrend = useQuery({ queryKey: [PAGE_KEY, 'tvlTrend'], queryFn: fetchTvlTrend });
 
   const m = metrics.data;
+  const metricsLoading = price.isLoading || metrics.isLoading || metrics.isPending;
 
   return (
     <>
@@ -42,10 +43,10 @@ export default function Portfolio() {
       </TopBar>
       <div className="p-6 space-y-6 max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard title="Total XAUT Managed" value={m ? formatGrams(m.totalXautGrams) : '—'} loading={metrics.isLoading} />
-          <MetricCard title="TVL (INR)" value={m ? formatINR(m.tvlINR) : '—'} loading={metrics.isLoading} />
-          <MetricCard title="Total Invested" value={m ? formatINR(m.totalInvested) : '—'} loading={metrics.isLoading} />
-          <MetricCard title="Avg PnL / User" value={m ? formatINR(m.avgPnl) : '—'} subtitle={m ? `${m.usersInProfit} profit / ${m.usersInLoss} loss` : undefined} loading={metrics.isLoading} />
+          <MetricCard title="Total XAUT Managed" value={m ? formatGrams(m.totalXautGrams) : '—'} loading={metricsLoading} />
+          <MetricCard title="TVL (INR)" value={m ? formatINR(m.tvlINR) : '—'} loading={metricsLoading} />
+          <MetricCard title="Total Invested" value={m ? formatINR(m.totalInvested) : '—'} loading={metricsLoading} />
+          <MetricCard title="Avg PnL / User" value={m ? formatINR(m.avgPnl) : '—'} subtitle={m ? `${m.usersInProfit} profit / ${m.usersInLoss} loss` : undefined} loading={metricsLoading} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -60,7 +61,7 @@ export default function Portfolio() {
             </ResponsiveContainer>
           </ChartCard>
 
-          <ChartCard title="Profit vs Loss Users" loading={metrics.isLoading} isEmpty={!m}>
+          <ChartCard title="Profit vs Loss Users" loading={metricsLoading} isEmpty={!m}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={m ? [{ name: 'In Profit', value: m.usersInProfit }, { name: 'In Loss', value: m.usersInLoss }] : []}>
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} />
