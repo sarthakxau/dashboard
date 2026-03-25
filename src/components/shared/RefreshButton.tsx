@@ -1,6 +1,6 @@
 import { RefreshCw } from 'lucide-react';
 import { usePageRefresh } from '@/hooks/usePageRefresh';
-import { formatRelativeTime } from '@/lib/formatters';
+import { formatDateTime } from '@/lib/formatters';
 
 export default function RefreshButton({ pageKey }: { pageKey: string }) {
   const { refresh, isRefreshing, getLastUpdated } = usePageRefresh(pageKey);
@@ -9,7 +9,7 @@ export default function RefreshButton({ pageKey }: { pageKey: string }) {
   return (
     <div className="flex items-center gap-2 text-xs text-secondary">
       {lastUpdated && (
-        <span>Updated {formatRelativeTime(new Date(lastUpdated))}</span>
+        <span>Updated {formatDateTime(new Date(lastUpdated))}</span>
       )}
       <button
         onClick={refresh}

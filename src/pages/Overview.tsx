@@ -21,7 +21,7 @@ export default function Overview() {
   const m = metrics.data;
   const p = price.data;
 
-  const xautInGrams = m && p
+  const xautInGrams = m
     ? formatGrams(new Decimal(m.totalXaut).times(GRAMS_PER_OUNCE))
     : '—';
 

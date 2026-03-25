@@ -10,7 +10,7 @@ import UnitToggle from '@/components/shared/UnitToggle';
 import DateRangeSelect from '@/components/shared/DateRangeSelect';
 import { fetchTransactionMetrics, fetchRecentTransactions, fetchVolumeTimeSeries, fetchHourlyDistribution, fetchBuySellRatio, fetchOrderSizeDistribution } from '@/lib/queries/transactions';
 import { fetchLatestPrice } from '@/lib/queries/price';
-import { formatINR, formatINRValue, formatRelativeTime, getExplorerUrl, truncateHash } from '@/lib/formatters';
+import { formatINR, formatINRValue, formatDateTime, getExplorerUrl, truncateHash } from '@/lib/formatters';
 import { useUnit } from '@/contexts/UnitContext';
 import { CHART_COLORS } from '@/lib/constants';
 import type { DateRangePreset, DbTransaction, Unit } from '@/types';
@@ -32,13 +32,13 @@ function getColumns(unit: Unit, price: { gold_price_usd: number; gold_price_inr:
       if (!hash) return '—';
       return <a href={getExplorerUrl(hash, r.created_at)} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-mono text-xs">{truncateHash(hash)}</a>;
     }},
-    { key: 'date', header: 'Date', render: (r) => formatRelativeTime(r.created_at), sortKey: (r) => r.created_at },
+    { key: 'date', header: 'Date', render: (r) => formatDateTime(r.created_at), sortKey: (r) => r.created_at },
   ];
 }
 
 export default function Transactions() {
   const { unit } = useUnit();
-  const [preset, setPreset] = useState<DateRangePreset>('7d');
+  const [preset, setPreset] = useState<DateRangePreset>('30d');
   const [typeFilter, setTypeFilter] = useState<'buy' | 'sell' | ''>('');
   const [statusFilter, setStatusFilter] = useState<string>('');
 
@@ -70,6 +70,11 @@ export default function Transactions() {
         <UnitToggle />
       </TopBar>
       <div className="p-6 space-y-6 max-w-7xl">
+        {!p && unit !== 'INR' && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 text-xs text-amber-700">
+            Price data unavailable — showing values in INR. Unit conversion requires price history.
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard title="Buy Volume" value={m ? fmtINR(m.buyVolumeINR) : '—'} subtitle={m ? `${m.buyCount} orders` : undefined} loading={metrics.isLoading} />
           <MetricCard title="Sell Volume" value={m ? fmtINR(m.sellVolumeINR) : '—'} subtitle={m ? `${m.sellCount} orders` : undefined} loading={metrics.isLoading} />

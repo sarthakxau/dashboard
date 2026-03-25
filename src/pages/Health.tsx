@@ -3,7 +3,7 @@ import TopBar from '@/components/layout/TopBar';
 import StatusDot from '@/components/shared/StatusDot';
 import DataTable, { type Column } from '@/components/shared/DataTable';
 import { fetchPriceOracleStatus, fetchFailedTxSummary, fetchStaleData, fetchDbStats, type DbTableStat } from '@/lib/queries/health';
-import { formatINR, formatUSD, formatRelativeTime, getExplorerUrl, truncateHash } from '@/lib/formatters';
+import { formatINR, formatUSD, formatDateTime, getExplorerUrl, truncateHash } from '@/lib/formatters';
 import { PRICE_STALE_THRESHOLD_MS } from '@/lib/constants';
 import type { DbTransaction } from '@/types';
 
@@ -18,7 +18,7 @@ const failedColumns: Column<DbTransaction>[] = [
     if (!hash) return '—';
     return <a href={getExplorerUrl(hash, r.created_at)} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-mono text-xs">{truncateHash(hash)}</a>;
   }},
-  { key: 'date', header: 'Date', render: (r) => formatRelativeTime(r.created_at), sortKey: (r) => r.created_at },
+  { key: 'date', header: 'Date', render: (r) => formatDateTime(r.created_at), sortKey: (r) => r.created_at },
 ];
 
 const dbColumns: Column<DbTableStat>[] = [
@@ -51,7 +51,7 @@ export default function Health() {
               <p className="text-xs text-secondary mb-1">Status</p>
               <div className="flex items-center gap-2">
                 <StatusDot status={priceStatus as 'healthy' | 'warning' | 'error'} />
-                <span>{o?.lastUpdate ? `Updated ${formatRelativeTime(o.lastUpdate)}` : 'Unknown'}</span>
+                <span>{o?.lastUpdate ? `Updated ${formatDateTime(o.lastUpdate)}` : 'Unknown'}</span>
               </div>
             </div>
             <div>

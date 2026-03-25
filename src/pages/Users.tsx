@@ -6,7 +6,7 @@ import ChartCard from '@/components/charts/ChartCard';
 import DataTable, { type Column } from '@/components/shared/DataTable';
 import StatusBadge from '@/components/shared/StatusBadge';
 import { fetchUserMetrics, fetchRecentSignups, fetchUserSegments, fetchSignupTimeSeries, fetchDailySignups } from '@/lib/queries/users';
-import { formatRelativeTime } from '@/lib/formatters';
+import { formatDate } from '@/lib/formatters';
 import { CHART_COLORS } from '@/lib/constants';
 import type { DbUser } from '@/types';
 
@@ -16,7 +16,7 @@ const columns: Column<DbUser>[] = [
   { key: 'email', header: 'Email / Phone', render: (r) => r.email ?? r.phone ?? '—', sortKey: (r) => r.email ?? r.phone ?? '' },
   { key: 'wallet', header: 'Wallet', render: (r) => r.wallet_address ? `${r.wallet_address.slice(0, 6)}...${r.wallet_address.slice(-4)}` : '—' },
   { key: 'kyc', header: 'KYC', render: (r) => <StatusBadge status={r.kyc_status} /> },
-  { key: 'created', header: 'Joined', render: (r) => formatRelativeTime(r.created_at), sortKey: (r) => r.created_at },
+  { key: 'created', header: 'Joined', render: (r) => formatDate(r.created_at), sortKey: (r) => r.created_at },
 ];
 
 

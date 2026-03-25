@@ -34,7 +34,9 @@ export default function Portfolio() {
   const tvlTrend = useQuery({ queryKey: [PAGE_KEY, 'tvlTrend'], queryFn: fetchTvlTrend });
 
   const m = metrics.data;
-  const metricsLoading = price.isLoading || metrics.isLoading || metrics.isPending;
+  // price loaded but returned null (empty table) = no price data available
+  const priceUnavailable = price.isSuccess && !price.data;
+  const metricsLoading = !priceUnavailable && (price.isLoading || metrics.isLoading || metrics.isPending);
 
   return (
     <>
@@ -42,11 +44,16 @@ export default function Portfolio() {
         <UnitToggle />
       </TopBar>
       <div className="p-6 space-y-6 max-w-7xl">
+        {priceUnavailable && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 text-xs text-amber-700">
+            Price data unavailable — portfolio metrics require price history to compute TVL and PnL.
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <MetricCard title="Total XAUT Managed" value={m ? formatGrams(m.totalXautGrams) : '—'} loading={metricsLoading} />
-          <MetricCard title="TVL (INR)" value={m ? formatINR(m.tvlINR) : '—'} loading={metricsLoading} />
-          <MetricCard title="Total Invested" value={m ? formatINR(m.totalInvested) : '—'} loading={metricsLoading} />
-          <MetricCard title="Avg PnL / User" value={m ? formatINR(m.avgPnl) : '—'} subtitle={m ? `${m.usersInProfit} profit / ${m.usersInLoss} loss` : undefined} loading={metricsLoading} />
+          <MetricCard title="Total XAUT Managed" value={m ? formatGrams(m.totalXautGrams) : priceUnavailable ? 'N/A' : '—'} loading={metricsLoading} />
+          <MetricCard title="TVL (INR)" value={m ? formatINR(m.tvlINR) : priceUnavailable ? 'N/A' : '—'} loading={metricsLoading} />
+          <MetricCard title="Total Invested" value={m ? formatINR(m.totalInvested) : priceUnavailable ? 'N/A' : '—'} loading={metricsLoading} />
+          <MetricCard title="Avg PnL / User" value={m ? formatINR(m.avgPnl) : priceUnavailable ? 'N/A' : '—'} subtitle={m ? `${m.usersInProfit} profit / ${m.usersInLoss} loss` : undefined} loading={metricsLoading} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

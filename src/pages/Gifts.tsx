@@ -8,7 +8,7 @@ import DataTable, { type Column } from '@/components/shared/DataTable';
 import StatusBadge from '@/components/shared/StatusBadge';
 import DateRangeSelect from '@/components/shared/DateRangeSelect';
 import { fetchGiftMetrics, fetchGiftFunnel, fetchGiftsByOccasion, fetchRecentGifts, fetchDailyGiftsSent, type RecentGift } from '@/lib/queries/gifts';
-import { formatINR, formatGrams, formatRelativeTime } from '@/lib/formatters';
+import { formatINR, formatGrams, formatDate } from '@/lib/formatters';
 import { CHART_COLORS } from '@/lib/constants';
 import type { DateRangePreset } from '@/types';
 
@@ -23,7 +23,7 @@ const columns: Column<RecentGift>[] = [
   { key: 'inr', header: 'INR Value', render: (r) => formatINR(r.inrAmount), sortKey: (r) => r.inrAmount },
   { key: 'occasion', header: 'Occasion', render: (r) => r.occasion },
   { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-  { key: 'date', header: 'Sent', render: (r) => formatRelativeTime(r.createdAt), sortKey: (r) => r.createdAt },
+  { key: 'date', header: 'Sent', render: (r) => formatDate(r.createdAt), sortKey: (r) => r.createdAt },
   { key: 'timeToClaim', header: 'Time to Claim', render: (r) => r.timeToClaimHours !== null ? `${r.timeToClaimHours}h` : '—', sortKey: (r) => r.timeToClaimHours ?? Infinity },
 ];
 

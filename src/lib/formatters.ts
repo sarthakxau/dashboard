@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { GRAMS_PER_OUNCE } from './constants';
 import type { Unit, LatestPrice } from '@/types';
 
@@ -39,8 +39,14 @@ export function formatCompactNumber(value: number): string {
   }).format(value);
 }
 
-export function formatRelativeTime(date: string | Date): string {
-  return formatDistanceToNow(new Date(date), { addSuffix: true });
+/** Format date as dd/mm/yy */
+export function formatDate(date: string | Date): string {
+  return format(new Date(date), 'dd/MM/yy');
+}
+
+/** Format date with time as dd/mm/yy HH:mm */
+export function formatDateTime(date: string | Date): string {
+  return format(new Date(date), 'dd/MM/yy HH:mm');
 }
 
 export function formatValue(
