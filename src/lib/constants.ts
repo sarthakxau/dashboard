@@ -7,11 +7,13 @@ export const ETHERSCAN_TX_URL = 'https://etherscan.io/tx/';
 export const ARBISCAN_TX_URL = 'https://arbiscan.io/tx/';
 
 export const CHART_COLORS = {
-  blue: '#2563EB',
-  emerald: '#10B981',
-  amber: '#F59E0B',
-  rose: '#F43F5E',
-  violet: '#8B5CF6',
+  gold: '#C8A55A',
+  teal: '#2DD4BF',
+  sky: '#38BDF8',
+  rose: '#FB7185',
+  violet: '#A78BFA',
+  emerald: '#34D399',
+  amber: '#FBBF24',
 } as const;
 
 export const PAGE_DEFAULTS = {

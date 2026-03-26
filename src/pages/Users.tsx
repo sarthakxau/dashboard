@@ -11,6 +11,8 @@ import { CHART_COLORS } from '@/lib/constants';
 import type { DbUser } from '@/types';
 
 const PAGE_KEY = 'users';
+const axisTick = { fontSize: 10, fill: '#71717A' };
+const tooltipStyle = { backgroundColor: '#1C1C20', border: '1px solid #27272A', borderRadius: 8 };
 
 const columns: Column<DbUser>[] = [
   { key: 'email', header: 'Email / Phone', render: (r) => r.email ?? r.phone ?? '—', sortKey: (r) => r.email ?? r.phone ?? '' },
@@ -40,7 +42,7 @@ export default function Users() {
   return (
     <>
       <TopBar title="Users" pageKey={PAGE_KEY} />
-      <div className="p-6 space-y-6 max-w-7xl">
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard title="Total Users" value={m ? m.total.toLocaleString('en-IN') : '—'} loading={metrics.isLoading} />
           <MetricCard title="New (24h)" value={m ? m.newDay.toLocaleString() : '—'} loading={metrics.isLoading} />
@@ -52,10 +54,10 @@ export default function Users() {
           <ChartCard title="User Growth (Cumulative)" loading={growth.isLoading} isEmpty={growth.data?.length === 0}>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={growth.data}>
-                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip />
-                <Line type="monotone" dataKey="count" stroke={CHART_COLORS.blue} strokeWidth={2} dot={false} name="Total Users" />
+                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={axisTick} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Line type="monotone" dataKey="count" stroke={CHART_COLORS.teal} strokeWidth={2} dot={false} name="Total Users" />
               </LineChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -63,27 +65,27 @@ export default function Users() {
           <ChartCard title="New Signups Per Day" loading={dailySignups.isLoading} isEmpty={dailySignups.data?.length === 0}>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={dailySignups.data}>
-                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" fill={CHART_COLORS.emerald} radius={[2, 2, 0, 0]} name="Signups" />
+                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={axisTick} allowDecimals={false} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Bar dataKey="count" fill={CHART_COLORS.emerald} radius={[3, 3, 0, 0]} name="Signups" />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="bg-card border border-border rounded-lg p-4 flex flex-col items-center justify-center opacity-60">
-            <h3 className="text-sm font-medium text-primary mb-2">KYC Status</h3>
-            <p className="text-xs text-secondary">Coming soon</p>
+          <div className="bg-card border border-border rounded-lg p-4 flex flex-col items-center justify-center">
+            <h3 className="text-sm font-medium text-primary mb-2 text-balance">KYC Status</h3>
+            <p className="text-xs text-tertiary">Coming soon</p>
           </div>
 
           <ChartCard title="User Segments" loading={segments.isLoading} isEmpty={!s}>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={segmentData} layout="vertical">
-                <XAxis type="number" tick={{ fontSize: 10 }} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 10 }} width={100} />
-                <Tooltip />
+                <XAxis type="number" tick={axisTick} />
+                <YAxis type="category" dataKey="name" tick={axisTick} width={80} />
+                <Tooltip contentStyle={tooltipStyle} />
                 <Bar dataKey="value" fill={CHART_COLORS.violet} radius={[0, 4, 4, 0]} name="Users" />
               </BarChart>
             </ResponsiveContainer>
@@ -91,7 +93,7 @@ export default function Users() {
         </div>
 
         <div className="bg-card border border-border rounded-lg p-4">
-          <h3 className="text-sm font-medium text-primary mb-3">Recent Signups</h3>
+          <h3 className="text-sm font-medium text-primary mb-3 text-balance">Recent Signups</h3>
           <DataTable columns={columns} data={signups.data ?? []} rowKey={(r) => r.id} />
         </div>
       </div>

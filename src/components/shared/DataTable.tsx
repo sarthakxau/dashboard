@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/cn';
 import { PAGE_SIZES } from '@/lib/constants';
 
 export interface Column<T> {
@@ -56,7 +57,10 @@ export default function DataTable<T>({ columns, data, rowKey }: DataTableProps<T
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="text-left px-3 py-2 text-xs font-medium text-secondary cursor-pointer select-none"
+                  className={cn(
+                    'text-left px-3 py-2.5 text-xs font-medium text-tertiary select-none',
+                    col.sortKey && 'cursor-pointer'
+                  )}
                   onClick={() => col.sortKey && handleSort(col.key)}
                 >
                   <span className="inline-flex items-center gap-1">
@@ -71,9 +75,9 @@ export default function DataTable<T>({ columns, data, rowKey }: DataTableProps<T
           </thead>
           <tbody>
             {pageData.map((row) => (
-              <tr key={rowKey(row)} className="border-b border-border/50 hover:bg-gray-50/50">
+              <tr key={rowKey(row)} className="border-b border-border/40 hover:bg-white/[0.02]">
                 {columns.map((col) => (
-                  <td key={col.key} className="px-3 py-2 text-primary">
+                  <td key={col.key} className="px-3 py-2.5 text-primary tabular-nums">
                     {col.render(row)}
                   </td>
                 ))}
@@ -82,13 +86,13 @@ export default function DataTable<T>({ columns, data, rowKey }: DataTableProps<T
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between px-3 py-2 text-xs text-secondary">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5 text-xs text-secondary">
         <div className="flex items-center gap-2">
           <span>Rows:</span>
           <select
             value={pageSize}
             onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
-            className="border border-border rounded px-1 py-0.5 bg-white"
+            className="border border-border rounded px-1.5 py-0.5 bg-elevated text-secondary text-xs"
           >
             {PAGE_SIZES.map((s) => (
               <option key={s} value={s}>{s}</option>
@@ -96,22 +100,22 @@ export default function DataTable<T>({ columns, data, rowKey }: DataTableProps<T
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <span>
+          <span className="tabular-nums">
             {sorted.length === 0
               ? 'No rows'
-              : `${page * pageSize + 1}-${Math.min((page + 1) * pageSize, sorted.length)} of ${sorted.length}`}
+              : `${page * pageSize + 1}\u2013${Math.min((page + 1) * pageSize, sorted.length)} of ${sorted.length}`}
           </span>
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="px-2 py-0.5 rounded border border-border disabled:opacity-30 hover:bg-gray-50"
+            className="px-2 py-0.5 rounded border border-border disabled:opacity-30 hover:bg-elevated text-secondary"
           >
             Prev
           </button>
           <button
             onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={page >= totalPages - 1}
-            className="px-2 py-0.5 rounded border border-border disabled:opacity-30 hover:bg-gray-50"
+            className="px-2 py-0.5 rounded border border-border disabled:opacity-30 hover:bg-elevated text-secondary"
           >
             Next
           </button>

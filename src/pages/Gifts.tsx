@@ -13,8 +13,10 @@ import { CHART_COLORS } from '@/lib/constants';
 import type { DateRangePreset } from '@/types';
 
 const PAGE_KEY = 'gifts';
+const axisTick = { fontSize: 10, fill: '#71717A' };
+const tooltipStyle = { backgroundColor: '#1C1C20', border: '1px solid #27272A', borderRadius: 8 };
 
-const FUNNEL_COLORS = [CHART_COLORS.amber, CHART_COLORS.blue, CHART_COLORS.emerald, CHART_COLORS.rose];
+const FUNNEL_COLORS = [CHART_COLORS.amber, CHART_COLORS.teal, CHART_COLORS.emerald, CHART_COLORS.rose];
 
 const columns: Column<RecentGift>[] = [
   { key: 'sender', header: 'Sender', render: (r) => <span className="text-xs">{r.senderEmail}</span> },
@@ -43,7 +45,7 @@ export default function Gifts() {
       <TopBar title="Gifts" pageKey={PAGE_KEY}>
         <DateRangeSelect value={preset} onChange={setPreset} />
       </TopBar>
-      <div className="p-6 space-y-6 max-w-7xl">
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard title="Total Sent" value={m ? m.totalSent.toLocaleString() : '—'} loading={metrics.isLoading} />
           <MetricCard title="Claimed" value={m ? m.totalClaimed.toLocaleString() : '—'} subtitle={m ? `${m.claimRate.toFixed(1)}% rate` : undefined} loading={metrics.isLoading} />
@@ -55,9 +57,9 @@ export default function Gifts() {
           <ChartCard title="Gift Funnel" loading={funnel.isLoading} isEmpty={funnel.data?.every((s) => s.count === 0)}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={funnel.data}>
-                <XAxis dataKey="stage" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
-                <Tooltip />
+                <XAxis dataKey="stage" tick={{ fontSize: 11, fill: '#71717A' }} />
+                <YAxis tick={axisTick} allowDecimals={false} />
+                <Tooltip contentStyle={tooltipStyle} />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Gifts">
                   {(funnel.data ?? []).map((_, i) => (
                     <Cell key={i} fill={FUNNEL_COLORS[i % FUNNEL_COLORS.length]} />
@@ -70,9 +72,9 @@ export default function Gifts() {
           <ChartCard title="Gifts by Occasion" loading={occasions.isLoading} isEmpty={occasions.data?.length === 0}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={occasions.data} layout="vertical">
-                <XAxis type="number" tick={{ fontSize: 10 }} />
-                <YAxis type="category" dataKey="occasion" tick={{ fontSize: 10 }} width={80} />
-                <Tooltip />
+                <XAxis type="number" tick={axisTick} />
+                <YAxis type="category" dataKey="occasion" tick={axisTick} width={80} />
+                <Tooltip contentStyle={tooltipStyle} />
                 <Bar dataKey="count" fill={CHART_COLORS.violet} radius={[0, 4, 4, 0]} name="Gifts" />
               </BarChart>
             </ResponsiveContainer>
@@ -82,16 +84,16 @@ export default function Gifts() {
         <ChartCard title="Daily Gifts Sent" loading={dailyGifts.isLoading} isEmpty={dailyGifts.data?.length === 0}>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={dailyGifts.data}>
-              <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d: string) => d.slice(5)} />
-              <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
-              <Tooltip />
+              <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
+              <YAxis tick={axisTick} allowDecimals={false} />
+              <Tooltip contentStyle={tooltipStyle} />
               <Line type="monotone" dataKey="count" stroke={CHART_COLORS.violet} strokeWidth={2} dot={false} name="Gifts Sent" />
             </LineChart>
           </ResponsiveContainer>
         </ChartCard>
 
         <div className="bg-card border border-border rounded-lg p-4">
-          <h3 className="text-sm font-medium text-primary mb-3">Recent Gifts</h3>
+          <h3 className="text-sm font-medium text-primary mb-3 text-balance">Recent Gifts</h3>
           <DataTable columns={columns} data={recent.data ?? []} rowKey={(r) => r.id} />
         </div>
       </div>

@@ -11,6 +11,8 @@ import { GRAMS_PER_OUNCE, CHART_COLORS, PRICE_STALE_THRESHOLD_MS } from '@/lib/c
 import Decimal from 'decimal.js';
 
 const PAGE_KEY = 'overview';
+const axisTick = { fontSize: 10, fill: '#71717A' };
+const tooltipStyle = { backgroundColor: '#1C1C20', border: '1px solid #27272A', borderRadius: 8 };
 
 export default function Overview() {
   const metrics = useQuery({ queryKey: [PAGE_KEY, 'metrics'], queryFn: fetchOverviewMetrics });
@@ -33,7 +35,7 @@ export default function Overview() {
   return (
     <>
       <TopBar title="Overview" pageKey={PAGE_KEY} />
-      <div className="p-6 space-y-6 max-w-7xl">
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard title="Total Users" value={m ? m.totalUsers.toLocaleString('en-IN') : '—'} subtitle={m ? `+${m.newUsersToday} today` : undefined} loading={metrics.isLoading} />
           <MetricCard title="Gold Under Management" value={xautInGrams} subtitle={p ? formatINR(new Decimal(m?.totalXaut ?? 0).times(p.gold_price_inr)) : undefined} loading={metrics.isLoading || price.isLoading} />
@@ -45,10 +47,10 @@ export default function Overview() {
           <ChartCard title="New Users (Last 30 Days)" isEmpty={dailyUsers.data?.length === 0} loading={dailyUsers.isLoading} error={dailyUsers.error?.message} onRetry={() => dailyUsers.refetch()}>
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={dailyUsers.data}>
-                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
-                <Tooltip />
-                <Area type="monotone" dataKey="value" stroke={CHART_COLORS.blue} fill={CHART_COLORS.blue} fillOpacity={0.1} name="Users" />
+                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={axisTick} allowDecimals={false} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Area type="monotone" dataKey="value" stroke={CHART_COLORS.teal} fill={CHART_COLORS.teal} fillOpacity={0.08} name="Users" />
               </AreaChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -56,17 +58,17 @@ export default function Overview() {
           <ChartCard title="Transaction Volume (Last 30 Days)" isEmpty={dailyVolume.data?.length === 0} loading={dailyVolume.isLoading} error={dailyVolume.error?.message} onRetry={() => dailyVolume.refetch()}>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={dailyVolume.data}>
-                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={{ fontSize: 10 }} tickFormatter={(v: number) => formatCompactNumber(v)} />
-                <Tooltip formatter={(v: number) => formatINR(v)} />
-                <Bar dataKey="value" fill={CHART_COLORS.blue} radius={[2, 2, 0, 0]} name="INR Volume" />
+                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={axisTick} tickFormatter={(v: number) => formatCompactNumber(v)} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => formatINR(v)} />
+                <Bar dataKey="value" fill={CHART_COLORS.gold} radius={[3, 3, 0, 0]} name="INR Volume" />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
         </div>
 
         <div className="bg-card border border-border rounded-lg p-4">
-          <h3 className="text-sm font-medium text-primary mb-3">Quick Health Check</h3>
+          <h3 className="text-sm font-medium text-primary mb-3 text-balance">Quick Health Check</h3>
           <div className="flex flex-wrap gap-6 text-sm">
             <div className="flex items-center gap-2">
               <StatusDot status={priceStatus} />

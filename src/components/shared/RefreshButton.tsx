@@ -7,14 +7,16 @@ export default function RefreshButton({ pageKey }: { pageKey: string }) {
   const lastUpdated = getLastUpdated();
 
   return (
-    <div className="flex items-center gap-2 text-xs text-secondary">
+    <div className="flex items-center gap-2 text-xs text-tertiary">
       {lastUpdated && (
-        <span>Updated {formatDateTime(new Date(lastUpdated))}</span>
+        <span className="hidden sm:inline tabular-nums">
+          Updated {formatDateTime(new Date(lastUpdated))}
+        </span>
       )}
       <button
         onClick={refresh}
         disabled={isRefreshing}
-        className="p-1.5 rounded-md hover:bg-gray-100 disabled:opacity-50 transition-colors"
+        className="p-1.5 rounded-md hover:bg-elevated disabled:opacity-50"
         aria-label="Refresh data"
       >
         <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />

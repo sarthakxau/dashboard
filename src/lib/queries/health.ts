@@ -33,18 +33,20 @@ export async function fetchPriceOracleStatus(): Promise<PriceOracleStatus> {
   const dayAgo = subDays(new Date(), 1).toISOString();
   const weekAgo = subDays(new Date(), 7).toISOString();
 
-  const [latestRes, range24hRes, historyRes] = await Promise.all([
+  const [latestRes, range24hHighRes, range24hLowRes, historyRes] = await Promise.all([
     supabase.from('price_history').select('gold_price_usd, gold_price_inr, usd_inr_rate, timestamp').order('timestamp', { ascending: false }).limit(1),
-    supabase.from('price_history').select('gold_price_usd').gte('timestamp', dayAgo),
-    supabase.from('price_history').select('timestamp').gte('timestamp', weekAgo).order('timestamp', { ascending: true }),
+    supabase.from('price_history').select('gold_price_usd').gte('timestamp', dayAgo).order('gold_price_usd', { ascending: false }).limit(1),
+    supabase.from('price_history').select('gold_price_usd').gte('timestamp', dayAgo).order('gold_price_usd', { ascending: true }).limit(1),
+    supabase.from('price_history').select('timestamp').gte('timestamp', weekAgo).order('timestamp', { ascending: true }).limit(10000),
   ]);
+
+  if (latestRes.error) throw new Error(`Price oracle query failed: ${latestRes.error.message}`);
 
   const latest = latestRes.data?.[0] ?? null;
 
-  // Compute 24h price range
-  const prices24h = (range24hRes.data ?? []).map((p) => p.gold_price_usd);
-  const price24hHighUSD = prices24h.length > 0 ? Math.max(...prices24h) : null;
-  const price24hLowUSD = prices24h.length > 0 ? Math.min(...prices24h) : null;
+  // 24h price range — fetched via ORDER BY + LIMIT 1 to avoid Supabase row caps
+  const price24hHighUSD = range24hHighRes.data?.[0]?.gold_price_usd ?? null;
+  const price24hLowUSD = range24hLowRes.data?.[0]?.gold_price_usd ?? null;
 
   // Count gaps > 10 minutes in last 7 days
   let gapCount = 0;
@@ -73,6 +75,8 @@ export async function fetchFailedTxSummary(): Promise<FailedTxSummary> {
     supabase.from('transactions').select('id', { count: 'exact', head: true }).eq('status', 'failed').gte('created_at', weekAgo),
     supabase.from('transactions').select('*').eq('status', 'failed').order('created_at', { ascending: false }).limit(50),
   ]);
+
+  if (recent.error) throw new Error(`Failed tx query failed: ${recent.error.message}`);
 
   // Group by error message
   const errorMap = new Map<string, number>();
@@ -109,7 +113,7 @@ export async function fetchStaleData(): Promise<StaleData> {
 }
 
 export async function fetchDbStats(): Promise<DbTableStat[]> {
-  const tables = ['users', 'transactions', 'holdings', 'gifts', 'user_gamification', 'user_badges', 'price_history'];
+  const tables = ['users', 'transactions', 'holdings', 'gifts', 'user_gamification', 'user_badge', 'price_history'];
 
   const results = await Promise.all(
     tables.map(async (table) => {

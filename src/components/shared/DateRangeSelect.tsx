@@ -18,7 +18,7 @@ export default function DateRangeSelect({ value, onChange }: DateRangeSelectProp
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as DateRangePreset)}
-      className="text-xs border border-border rounded-md px-2 py-1 bg-white text-primary"
+      className="text-xs border border-border rounded-md px-2 py-1 bg-elevated text-secondary"
     >
       {presets.map((p) => (
         <option key={p.value} value={p.value}>{p.label}</option>

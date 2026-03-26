@@ -16,6 +16,8 @@ import { CHART_COLORS } from '@/lib/constants';
 import type { DateRangePreset, DbTransaction, Unit } from '@/types';
 
 const PAGE_KEY = 'transactions';
+const axisTick = { fontSize: 10, fill: '#71717A' };
+const tooltipStyle = { backgroundColor: '#1C1C20', border: '1px solid #27272A', borderRadius: 8 };
 
 function getColumns(unit: Unit, price: { gold_price_usd: number; gold_price_inr: number; usd_inr_rate: number } | null): Column<DbTransaction>[] {
   const fmtAmount = (inr: number) => {
@@ -24,13 +26,13 @@ function getColumns(unit: Unit, price: { gold_price_usd: number; gold_price_inr:
   };
 
   return [
-    { key: 'type', header: 'Type', render: (r) => <span className={r.type === 'buy' ? 'text-emerald-600' : 'text-rose-600'}>{r.type.toUpperCase()}</span> },
+    { key: 'type', header: 'Type', render: (r) => <span className={r.type === 'buy' ? 'text-chart-emerald' : 'text-chart-rose'}>{r.type.toUpperCase()}</span> },
     { key: 'amount', header: `Amount (${unit})`, render: (r) => r.inr_amount ? fmtAmount(r.inr_amount) : '—', sortKey: (r) => r.inr_amount ?? 0 },
     { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
     { key: 'tx', header: 'Tx Hash', render: (r) => {
       const hash = r.dex_swap_tx_hash ?? r.blockchain_tx_hash;
       if (!hash) return '—';
-      return <a href={getExplorerUrl(hash, r.created_at)} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline font-mono text-xs">{truncateHash(hash)}</a>;
+      return <a href={getExplorerUrl(hash, r.created_at)} target="_blank" rel="noopener noreferrer" className="text-accent hover:text-accent/80 font-mono text-xs">{truncateHash(hash)}</a>;
     }},
     { key: 'date', header: 'Date', render: (r) => formatDateTime(r.created_at), sortKey: (r) => r.created_at },
   ];
@@ -69,9 +71,9 @@ export default function Transactions() {
         <DateRangeSelect value={preset} onChange={setPreset} />
         <UnitToggle />
       </TopBar>
-      <div className="p-6 space-y-6 max-w-7xl">
+      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-7xl">
         {!p && unit !== 'INR' && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 text-xs text-amber-700">
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-2 text-xs text-amber-400">
             Price data unavailable — showing values in INR. Unit conversion requires price history.
           </div>
         )}
@@ -86,11 +88,11 @@ export default function Transactions() {
           <ChartCard title="Daily Volume (Buy vs Sell)" loading={volume.isLoading} isEmpty={volume.data?.length === 0}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={volume.data}>
-                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip formatter={(v: number) => fmtINR(v)} />
+                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={axisTick} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => fmtINR(v)} />
                 <Legend />
-                <Bar dataKey="buy" fill={CHART_COLORS.blue} stackId="a" radius={[2, 2, 0, 0]} name="Buy" />
+                <Bar dataKey="buy" fill={CHART_COLORS.teal} stackId="a" radius={[3, 3, 0, 0]} name="Buy" />
                 <Bar dataKey="sell" fill={CHART_COLORS.emerald} stackId="a" name="Sell" />
               </BarChart>
             </ResponsiveContainer>
@@ -99,9 +101,9 @@ export default function Transactions() {
           <ChartCard title="Buy/Sell Ratio Over Time" loading={ratio.isLoading} isEmpty={ratio.data?.length === 0}>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={ratio.data}>
-                <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip />
+                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={axisTick} />
+                <Tooltip contentStyle={tooltipStyle} />
                 <Line type="monotone" dataKey="ratio" stroke={CHART_COLORS.amber} strokeWidth={2} dot={false} name="Buy/Sell Ratio" />
               </LineChart>
             </ResponsiveContainer>
@@ -112,10 +114,10 @@ export default function Transactions() {
           <ChartCard title="Order Size Distribution" loading={orderSizes.isLoading} isEmpty={orderSizes.data?.every((b) => b.count === 0)}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={orderSizes.data}>
-                <XAxis dataKey="range" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
-                <Tooltip />
-                <Bar dataKey="count" fill={CHART_COLORS.blue} radius={[4, 4, 0, 0]} name="Orders" />
+                <XAxis dataKey="range" tick={axisTick} />
+                <YAxis tick={axisTick} allowDecimals={false} />
+                <Tooltip contentStyle={tooltipStyle} />
+                <Bar dataKey="count" fill={CHART_COLORS.sky} radius={[4, 4, 0, 0]} name="Orders" />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -123,25 +125,25 @@ export default function Transactions() {
           <ChartCard title="Transactions by Hour (IST)" loading={hourly.isLoading} isEmpty={hourly.data?.every((h) => h.count === 0)}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={hourly.data}>
-                <XAxis dataKey="hour" tick={{ fontSize: 10 }} tickFormatter={(h: number) => `${h}:00`} />
-                <YAxis tick={{ fontSize: 10 }} allowDecimals={false} />
-                <Tooltip labelFormatter={(h: number) => `${h}:00 - ${h + 1}:00`} />
-                <Bar dataKey="count" fill={CHART_COLORS.violet} radius={[2, 2, 0, 0]} name="Transactions" />
+                <XAxis dataKey="hour" tick={axisTick} tickFormatter={(h: number) => `${h}:00`} />
+                <YAxis tick={axisTick} allowDecimals={false} />
+                <Tooltip contentStyle={tooltipStyle} labelFormatter={(h: number) => `${h}:00 - ${h + 1}:00`} />
+                <Bar dataKey="count" fill={CHART_COLORS.violet} radius={[3, 3, 0, 0]} name="Transactions" />
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
         </div>
 
         <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-primary">Recent Transactions</h3>
-            <div className="flex gap-2">
-              <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)} className="text-xs border border-border rounded px-2 py-1 bg-white">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 className="text-sm font-medium text-primary text-balance">Recent Transactions</h3>
+            <div className="flex flex-wrap gap-2">
+              <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)} className="text-xs border border-border rounded px-2 py-1 bg-elevated text-secondary">
                 <option value="">All Types</option>
                 <option value="buy">Buy</option>
                 <option value="sell">Sell</option>
               </select>
-              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="text-xs border border-border rounded px-2 py-1 bg-white">
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="text-xs border border-border rounded px-2 py-1 bg-elevated text-secondary">
                 <option value="">All Status</option>
                 <option value="completed">Completed</option>
                 <option value="pending">Pending</option>

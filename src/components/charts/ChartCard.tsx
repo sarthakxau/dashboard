@@ -16,11 +16,11 @@ export default function ChartCard({ title, children, isEmpty, error, onRetry, ac
   return (
     <div className="bg-card border border-border rounded-lg p-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-primary">{title}</h3>
+        <h3 className="text-sm font-medium text-primary text-balance">{title}</h3>
         {actions}
       </div>
       {loading ? (
-        <div className="h-48 bg-gray-50 rounded animate-pulse" />
+        <div className="h-48 bg-elevated rounded" />
       ) : error ? (
         <ErrorState message={error} onRetry={onRetry} />
       ) : isEmpty ? (

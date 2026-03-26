@@ -1,4 +1,5 @@
 import { useUnit } from '@/contexts/UnitContext';
+import { cn } from '@/lib/cn';
 import type { Unit } from '@/types';
 
 const units: Unit[] = ['INR', 'USD', 'Grams'];
@@ -7,16 +8,17 @@ export default function UnitToggle() {
   const { unit, setUnit } = useUnit();
 
   return (
-    <div className="flex bg-gray-100 rounded-md p-0.5">
+    <div className="flex bg-elevated rounded-md p-0.5 border border-border">
       {units.map((u) => (
         <button
           key={u}
           onClick={() => setUnit(u)}
-          className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${
+          className={cn(
+            'px-2.5 py-1 text-xs font-medium rounded-[5px]',
             unit === u
-              ? 'bg-white text-primary shadow-sm'
-              : 'text-secondary hover:text-primary'
-          }`}
+              ? 'bg-accent-muted text-accent'
+              : 'text-tertiary hover:text-secondary'
+          )}
         >
           {u}
         </button>
