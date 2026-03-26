@@ -9,8 +9,8 @@ const config: Config = {
         surface: '#131316',
         card: '#18181B',
         elevated: '#1C1C20',
-        border: '#27272A',
-        'border-strong': '#3F3F46',
+        border: 'rgba(255, 255, 255, 0.06)',
+        'border-strong': 'rgba(255, 255, 255, 0.12)',
         primary: '#FAFAFA',
         secondary: '#A1A1AA',
         tertiary: '#71717A',
@@ -24,6 +24,17 @@ const config: Config = {
           violet: '#A78BFA',
           emerald: '#34D399',
           amber: '#FBBF24',
+        },
+        control: {
+          bg: 'rgba(0, 0, 0, 0.25)',
+          border: 'rgba(255, 255, 255, 0.08)',
+          focus: 'rgba(200, 165, 90, 0.4)',
+        },
+        semantic: {
+          success: '#34D399',
+          warning: '#FBBF24',
+          error: '#FB7185',
+          info: '#38BDF8',
         },
       },
       fontFamily: {

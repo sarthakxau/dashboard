@@ -8,7 +8,7 @@ export default function UnitToggle() {
   const { unit, setUnit } = useUnit();
 
   return (
-    <div className="flex bg-elevated rounded-md p-0.5 border border-border">
+    <div className="flex bg-black/20 rounded-md p-0.5 border border-white/[0.08]">
       {units.map((u) => (
         <button
           key={u}

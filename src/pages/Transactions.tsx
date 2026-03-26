@@ -13,11 +13,10 @@ import { fetchLatestPrice } from '@/lib/queries/price';
 import { formatINR, formatINRValue, formatDateTime, getExplorerUrl, truncateHash } from '@/lib/formatters';
 import { useUnit } from '@/contexts/UnitContext';
 import { CHART_COLORS } from '@/lib/constants';
+import { AXIS_TICK, TOOLTIP_STYLE, LEGEND_STYLE } from '@/lib/chartTheme';
 import type { DateRangePreset, DbTransaction, Unit } from '@/types';
 
 const PAGE_KEY = 'transactions';
-const axisTick = { fontSize: 10, fill: '#71717A' };
-const tooltipStyle = { backgroundColor: '#1C1C20', border: '1px solid #27272A', borderRadius: 8 };
 
 function getColumns(unit: Unit, price: { gold_price_usd: number; gold_price_inr: number; usd_inr_rate: number } | null): Column<DbTransaction>[] {
   const fmtAmount = (inr: number) => {
@@ -88,10 +87,10 @@ export default function Transactions() {
           <ChartCard title="Daily Volume (Buy vs Sell)" loading={volume.isLoading} isEmpty={volume.data?.length === 0}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={volume.data}>
-                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={axisTick} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => fmtINR(v)} />
-                <Legend />
+                <XAxis dataKey="date" tick={AXIS_TICK} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={AXIS_TICK} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => fmtINR(v)} />
+                <Legend wrapperStyle={LEGEND_STYLE} />
                 <Bar dataKey="buy" fill={CHART_COLORS.teal} stackId="a" radius={[3, 3, 0, 0]} name="Buy" />
                 <Bar dataKey="sell" fill={CHART_COLORS.emerald} stackId="a" name="Sell" />
               </BarChart>
@@ -101,9 +100,9 @@ export default function Transactions() {
           <ChartCard title="Buy/Sell Ratio Over Time" loading={ratio.isLoading} isEmpty={ratio.data?.length === 0}>
             <ResponsiveContainer width="100%" height={220}>
               <LineChart data={ratio.data}>
-                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={axisTick} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis dataKey="date" tick={AXIS_TICK} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={AXIS_TICK} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Line type="monotone" dataKey="ratio" stroke={CHART_COLORS.amber} strokeWidth={2} dot={false} name="Buy/Sell Ratio" />
               </LineChart>
             </ResponsiveContainer>
@@ -114,9 +113,9 @@ export default function Transactions() {
           <ChartCard title="Order Size Distribution" loading={orderSizes.isLoading} isEmpty={orderSizes.data?.every((b) => b.count === 0)}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={orderSizes.data}>
-                <XAxis dataKey="range" tick={axisTick} />
-                <YAxis tick={axisTick} allowDecimals={false} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis dataKey="range" tick={AXIS_TICK} />
+                <YAxis tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Bar dataKey="count" fill={CHART_COLORS.sky} radius={[4, 4, 0, 0]} name="Orders" />
               </BarChart>
             </ResponsiveContainer>
@@ -125,9 +124,9 @@ export default function Transactions() {
           <ChartCard title="Transactions by Hour (IST)" loading={hourly.isLoading} isEmpty={hourly.data?.every((h) => h.count === 0)}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={hourly.data}>
-                <XAxis dataKey="hour" tick={axisTick} tickFormatter={(h: number) => `${h}:00`} />
-                <YAxis tick={axisTick} allowDecimals={false} />
-                <Tooltip contentStyle={tooltipStyle} labelFormatter={(h: number) => `${h}:00 - ${h + 1}:00`} />
+                <XAxis dataKey="hour" tick={AXIS_TICK} tickFormatter={(h: number) => `${h}:00`} />
+                <YAxis tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} labelFormatter={(h: number) => `${h}:00 - ${h + 1}:00`} />
                 <Bar dataKey="count" fill={CHART_COLORS.violet} radius={[3, 3, 0, 0]} name="Transactions" />
               </BarChart>
             </ResponsiveContainer>
@@ -138,12 +137,12 @@ export default function Transactions() {
           <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
             <h3 className="text-sm font-medium text-primary text-balance">Recent Transactions</h3>
             <div className="flex flex-wrap gap-2">
-              <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)} className="text-xs border border-border rounded px-2 py-1 bg-elevated text-secondary">
+              <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)} className="text-xs border border-white/[0.08] rounded px-2 py-1 bg-black/20 text-secondary">
                 <option value="">All Types</option>
                 <option value="buy">Buy</option>
                 <option value="sell">Sell</option>
               </select>
-              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="text-xs border border-border rounded px-2 py-1 bg-elevated text-secondary">
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="text-xs border border-white/[0.08] rounded px-2 py-1 bg-black/20 text-secondary">
                 <option value="">All Status</option>
                 <option value="completed">Completed</option>
                 <option value="pending">Pending</option>

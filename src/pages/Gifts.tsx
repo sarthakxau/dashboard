@@ -10,11 +10,10 @@ import DateRangeSelect from '@/components/shared/DateRangeSelect';
 import { fetchGiftMetrics, fetchGiftFunnel, fetchGiftsByOccasion, fetchRecentGifts, fetchDailyGiftsSent, type RecentGift } from '@/lib/queries/gifts';
 import { formatINR, formatGrams, formatDate } from '@/lib/formatters';
 import { CHART_COLORS } from '@/lib/constants';
+import { AXIS_TICK, TOOLTIP_STYLE } from '@/lib/chartTheme';
 import type { DateRangePreset } from '@/types';
 
 const PAGE_KEY = 'gifts';
-const axisTick = { fontSize: 10, fill: '#71717A' };
-const tooltipStyle = { backgroundColor: '#1C1C20', border: '1px solid #27272A', borderRadius: 8 };
 
 const FUNNEL_COLORS = [CHART_COLORS.amber, CHART_COLORS.teal, CHART_COLORS.emerald, CHART_COLORS.rose];
 
@@ -57,12 +56,12 @@ export default function Gifts() {
           <ChartCard title="Gift Funnel" loading={funnel.isLoading} isEmpty={funnel.data?.every((s) => s.count === 0)}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={funnel.data}>
-                <XAxis dataKey="stage" tick={{ fontSize: 11, fill: '#71717A' }} />
-                <YAxis tick={axisTick} allowDecimals={false} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis dataKey="stage" tick={AXIS_TICK} />
+                <YAxis tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]} name="Gifts">
-                  {(funnel.data ?? []).map((_, i) => (
-                    <Cell key={i} fill={FUNNEL_COLORS[i % FUNNEL_COLORS.length]} />
+                  {(funnel.data ?? []).map((entry, i) => (
+                    <Cell key={entry.stage} fill={FUNNEL_COLORS[i % FUNNEL_COLORS.length]} />
                   ))}
                 </Bar>
               </BarChart>
@@ -72,9 +71,9 @@ export default function Gifts() {
           <ChartCard title="Gifts by Occasion" loading={occasions.isLoading} isEmpty={occasions.data?.length === 0}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={occasions.data} layout="vertical">
-                <XAxis type="number" tick={axisTick} />
-                <YAxis type="category" dataKey="occasion" tick={axisTick} width={80} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis type="number" tick={AXIS_TICK} />
+                <YAxis type="category" dataKey="occasion" tick={AXIS_TICK} width={80} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Bar dataKey="count" fill={CHART_COLORS.violet} radius={[0, 4, 4, 0]} name="Gifts" />
               </BarChart>
             </ResponsiveContainer>
@@ -84,9 +83,9 @@ export default function Gifts() {
         <ChartCard title="Daily Gifts Sent" loading={dailyGifts.isLoading} isEmpty={dailyGifts.data?.length === 0}>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={dailyGifts.data}>
-              <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
-              <YAxis tick={axisTick} allowDecimals={false} />
-              <Tooltip contentStyle={tooltipStyle} />
+              <XAxis dataKey="date" tick={AXIS_TICK} tickFormatter={(d: string) => d.slice(5)} />
+              <YAxis tick={AXIS_TICK} allowDecimals={false} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
               <Line type="monotone" dataKey="count" stroke={CHART_COLORS.violet} strokeWidth={2} dot={false} name="Gifts Sent" />
             </LineChart>
           </ResponsiveContainer>

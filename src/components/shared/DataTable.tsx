@@ -92,7 +92,7 @@ export default function DataTable<T>({ columns, data, rowKey }: DataTableProps<T
           <select
             value={pageSize}
             onChange={(e) => { setPageSize(Number(e.target.value)); setPage(0); }}
-            className="border border-border rounded px-1.5 py-0.5 bg-elevated text-secondary text-xs"
+            className="border border-white/[0.08] rounded px-1.5 py-0.5 bg-black/20 text-secondary text-xs"
           >
             {PAGE_SIZES.map((s) => (
               <option key={s} value={s}>{s}</option>

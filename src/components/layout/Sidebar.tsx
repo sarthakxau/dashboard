@@ -20,7 +20,7 @@ const navItems = [
 
 export default function Sidebar() {
   return (
-    <aside className="fixed left-0 top-0 h-dvh w-14 lg:w-56 bg-surface border-r border-border flex flex-col py-5 z-sidebar">
+    <aside className="fixed left-0 top-0 h-dvh w-14 lg:w-56 bg-background border-r border-border flex flex-col py-5 z-sidebar">
       <div className="px-3 lg:px-5 mb-8">
         <span className="hidden lg:flex items-center gap-2 text-sm font-semibold text-primary tracking-tight">
           <span className="size-1.5 rounded-full bg-accent" />
@@ -40,7 +40,7 @@ export default function Sidebar() {
               cn(
                 'flex items-center gap-3 px-2.5 lg:px-3 py-2 rounded-md text-[13px] font-medium',
                 isActive
-                  ? 'bg-accent-muted text-accent'
+                  ? 'relative before:absolute before:left-0 before:top-1 before:bottom-1 before:w-0.5 before:rounded-full before:bg-accent bg-accent-muted text-accent'
                   : 'text-tertiary hover:text-secondary hover:bg-white/[0.03]'
               )
             }

@@ -12,7 +12,7 @@ interface MetricCardProps {
 export default function MetricCard({ title, value, subtitle, trend, loading }: MetricCardProps) {
   if (loading) {
     return (
-      <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+      <div className="bg-card border border-border rounded-lg p-4 space-y-3 border-l-2 border-l-accent/20">
         <div className="h-3 w-24 bg-elevated rounded" />
         <div className="h-7 w-32 bg-elevated rounded" />
         <div className="h-3 w-16 bg-elevated rounded" />
@@ -21,7 +21,7 @@ export default function MetricCard({ title, value, subtitle, trend, loading }: M
   }
 
   return (
-    <div className="bg-card border border-border rounded-lg p-4">
+    <div className="bg-card border border-border rounded-lg p-4 border-l-2 border-l-accent/20">
       <p className="text-xs font-medium text-tertiary mb-1.5 text-pretty">{title}</p>
       <p className="text-xl sm:text-2xl font-semibold font-mono tabular-nums text-primary truncate">
         {value}

@@ -9,10 +9,9 @@ import { fetchPortfolioMetrics, fetchHoldingsDistribution, fetchTopHolders, fetc
 import { fetchLatestPrice } from '@/lib/queries/price';
 import { formatINR, formatGrams } from '@/lib/formatters';
 import { CHART_COLORS } from '@/lib/constants';
+import { AXIS_TICK, TOOLTIP_STYLE } from '@/lib/chartTheme';
 
 const PAGE_KEY = 'portfolio';
-const axisTick = { fontSize: 10, fill: '#71717A' };
-const tooltipStyle = { backgroundColor: '#1C1C20', border: '1px solid #27272A', borderRadius: 8 };
 
 const LEVEL_NAMES = ['Rookie', 'Hustler', 'Grinder', 'Boss', 'Mogul', 'Legend'];
 
@@ -61,9 +60,9 @@ export default function Portfolio() {
           <ChartCard title="Holdings Distribution" loading={distribution.isLoading} isEmpty={distribution.data?.every((b) => b.count === 0)}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={distribution.data}>
-                <XAxis dataKey="range" tick={{ fontSize: 11, fill: '#71717A' }} />
-                <YAxis tick={axisTick} allowDecimals={false} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis dataKey="range" tick={AXIS_TICK} />
+                <YAxis tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Bar dataKey="count" fill={CHART_COLORS.gold} radius={[4, 4, 0, 0]} name="Users" />
               </BarChart>
             </ResponsiveContainer>
@@ -72,9 +71,9 @@ export default function Portfolio() {
           <ChartCard title="Profit vs Loss Users" loading={metricsLoading} isEmpty={!m}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={m ? [{ name: 'In Profit', value: m.usersInProfit }, { name: 'In Loss', value: m.usersInLoss }] : []}>
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#71717A' }} />
-                <YAxis tick={axisTick} allowDecimals={false} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis dataKey="name" tick={AXIS_TICK} />
+                <YAxis tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Bar dataKey="value" radius={[4, 4, 0, 0]} name="Users">
                   <Cell fill={CHART_COLORS.emerald} />
                   <Cell fill={CHART_COLORS.rose} />
@@ -87,9 +86,9 @@ export default function Portfolio() {
         <ChartCard title="TVL Trend Over Time" loading={tvlTrend.isLoading} isEmpty={tvlTrend.data?.length === 0}>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={tvlTrend.data}>
-              <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
-              <YAxis tick={axisTick} tickFormatter={(v: number) => `₹${(v / 100000).toFixed(0)}L`} />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => formatINR(v)} />
+              <XAxis dataKey="date" tick={AXIS_TICK} tickFormatter={(d: string) => d.slice(5)} />
+              <YAxis tick={AXIS_TICK} tickFormatter={(v: number) => `₹${(v / 100000).toFixed(0)}L`} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatINR(v)} />
               <Line type="monotone" dataKey="tvlINR" stroke={CHART_COLORS.gold} strokeWidth={2} dot={false} name="TVL (INR)" />
             </LineChart>
           </ResponsiveContainer>

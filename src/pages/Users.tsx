@@ -8,11 +8,10 @@ import StatusBadge from '@/components/shared/StatusBadge';
 import { fetchUserMetrics, fetchRecentSignups, fetchUserSegments, fetchSignupTimeSeries, fetchDailySignups } from '@/lib/queries/users';
 import { formatDate } from '@/lib/formatters';
 import { CHART_COLORS } from '@/lib/constants';
+import { AXIS_TICK, TOOLTIP_STYLE } from '@/lib/chartTheme';
 import type { DbUser } from '@/types';
 
 const PAGE_KEY = 'users';
-const axisTick = { fontSize: 10, fill: '#71717A' };
-const tooltipStyle = { backgroundColor: '#1C1C20', border: '1px solid #27272A', borderRadius: 8 };
 
 const columns: Column<DbUser>[] = [
   { key: 'email', header: 'Email / Phone', render: (r) => r.email ?? r.phone ?? '—', sortKey: (r) => r.email ?? r.phone ?? '' },
@@ -54,9 +53,9 @@ export default function Users() {
           <ChartCard title="User Growth (Cumulative)" loading={growth.isLoading} isEmpty={growth.data?.length === 0}>
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={growth.data}>
-                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={axisTick} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis dataKey="date" tick={AXIS_TICK} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={AXIS_TICK} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Line type="monotone" dataKey="count" stroke={CHART_COLORS.teal} strokeWidth={2} dot={false} name="Total Users" />
               </LineChart>
             </ResponsiveContainer>
@@ -65,9 +64,9 @@ export default function Users() {
           <ChartCard title="New Signups Per Day" loading={dailySignups.isLoading} isEmpty={dailySignups.data?.length === 0}>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={dailySignups.data}>
-                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={axisTick} allowDecimals={false} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis dataKey="date" tick={AXIS_TICK} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Bar dataKey="count" fill={CHART_COLORS.emerald} radius={[3, 3, 0, 0]} name="Signups" />
               </BarChart>
             </ResponsiveContainer>
@@ -83,9 +82,9 @@ export default function Users() {
           <ChartCard title="User Segments" loading={segments.isLoading} isEmpty={!s}>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={segmentData} layout="vertical">
-                <XAxis type="number" tick={axisTick} />
-                <YAxis type="category" dataKey="name" tick={axisTick} width={80} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis type="number" tick={AXIS_TICK} />
+                <YAxis type="category" dataKey="name" tick={AXIS_TICK} width={80} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Bar dataKey="value" fill={CHART_COLORS.violet} radius={[0, 4, 4, 0]} name="Users" />
               </BarChart>
             </ResponsiveContainer>

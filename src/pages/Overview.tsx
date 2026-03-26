@@ -8,11 +8,10 @@ import { fetchOverviewMetrics, fetchDailyNewUsers, fetchDailyTxVolume } from '@/
 import { fetchLatestPrice } from '@/lib/queries/price';
 import { formatINR, formatGrams, formatCompactNumber } from '@/lib/formatters';
 import { GRAMS_PER_OUNCE, CHART_COLORS, PRICE_STALE_THRESHOLD_MS } from '@/lib/constants';
+import { AXIS_TICK, TOOLTIP_STYLE } from '@/lib/chartTheme';
 import Decimal from 'decimal.js';
 
 const PAGE_KEY = 'overview';
-const axisTick = { fontSize: 10, fill: '#71717A' };
-const tooltipStyle = { backgroundColor: '#1C1C20', border: '1px solid #27272A', borderRadius: 8 };
 
 export default function Overview() {
   const metrics = useQuery({ queryKey: [PAGE_KEY, 'metrics'], queryFn: fetchOverviewMetrics });
@@ -47,9 +46,9 @@ export default function Overview() {
           <ChartCard title="New Users (Last 30 Days)" isEmpty={dailyUsers.data?.length === 0} loading={dailyUsers.isLoading} error={dailyUsers.error?.message} onRetry={() => dailyUsers.refetch()}>
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={dailyUsers.data}>
-                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={axisTick} allowDecimals={false} />
-                <Tooltip contentStyle={tooltipStyle} />
+                <XAxis dataKey="date" tick={AXIS_TICK} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} />
                 <Area type="monotone" dataKey="value" stroke={CHART_COLORS.teal} fill={CHART_COLORS.teal} fillOpacity={0.08} name="Users" />
               </AreaChart>
             </ResponsiveContainer>
@@ -58,9 +57,9 @@ export default function Overview() {
           <ChartCard title="Transaction Volume (Last 30 Days)" isEmpty={dailyVolume.data?.length === 0} loading={dailyVolume.isLoading} error={dailyVolume.error?.message} onRetry={() => dailyVolume.refetch()}>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={dailyVolume.data}>
-                <XAxis dataKey="date" tick={axisTick} tickFormatter={(d: string) => d.slice(5)} />
-                <YAxis tick={axisTick} tickFormatter={(v: number) => formatCompactNumber(v)} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => formatINR(v)} />
+                <XAxis dataKey="date" tick={AXIS_TICK} tickFormatter={(d: string) => d.slice(5)} />
+                <YAxis tick={AXIS_TICK} tickFormatter={(v: number) => formatCompactNumber(v)} />
+                <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v: number) => formatINR(v)} />
                 <Bar dataKey="value" fill={CHART_COLORS.gold} radius={[3, 3, 0, 0]} name="INR Volume" />
               </BarChart>
             </ResponsiveContainer>
